@@ -12,7 +12,7 @@ public class UsersService implements UserServiceInterface {
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public UsersService(JdbcTemplate jdbcTemplate){
+    public UserService(JdbcTemplate jdbcTemplate){
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -21,7 +21,7 @@ public class UsersService implements UserServiceInterface {
         try {
             return jdbcTemplate.queryForObject(
                     sql,
-                    new Object[]{id},
+                    new Object[] { id },
                     (rs, rowNum) -> {
                         Users user = new Users();
                         user.setId(rs.getInt("id"));
@@ -31,8 +31,9 @@ public class UsersService implements UserServiceInterface {
                         user.setAddress(rs.getString("address"));
 
                         return user;
-                    });} catch(EmptyResultDataAccessException e){
-            return null; // или можно бросить исключение, если пользователь не найден
+                    });
+        } catch (EmptyResultDataAccessException e) {
+            return null;
         }
     }
 
@@ -41,7 +42,7 @@ public class UsersService implements UserServiceInterface {
         try {
             return jdbcTemplate.queryForObject(
                     sql,
-                    new Object[]{email},
+                    new Object[] { email },
                     (rs, rowNum) -> {
                         Users user = new Users();
                         user.setId(rs.getInt("id"));
@@ -51,26 +52,27 @@ public class UsersService implements UserServiceInterface {
                         user.setAddress(rs.getString("address"));
 
                         return user;
-                    });} catch(EmptyResultDataAccessException e){
-            return null; // или можно бросить исключение, если пользователь не найден
+                    });
+        } catch (EmptyResultDataAccessException e) {
+            return null;
         }
     }
 
-    public Users updateUserById(Users users){
+    public Users updateUserById(Users users) {
         String sql = "UPDATE users SET name = ?, email = ?, address = ?, phone = ? WHERE id = ?";
         jdbcTemplate.update(sql, users.getName(), users.getEmail(),
-                users.getAddress(), users.getPhone(),users.getId());
+                users.getAddress(), users.getPhone(), users.getId());
         return this.getUserById(users.getId());
     }
 
-    public Users deleteUserById(int id){
+    public Users deleteUserById(int id) {
         Users user = this.getUserById(id);
         String sql = "DELETE FROM users WHERE id = ?";
         this.jdbcTemplate.update(sql, id);
         return user;
     }
 
-    public Users createUser(Users user){
+    public Users createUser(Users user) {
         String sql = "INSERT INTO users (name, email, address, phone) VALUES (?, ?, ?, ?)";
         this.jdbcTemplate.update(sql, user.getName(), user.getEmail(), user.getAddress(), user.getPhone());
         return this.getUserByEmail(user.getEmail());
